@@ -22,16 +22,7 @@ if [[ "${CI_BUILD}" != "no" ]]; then
   git config --global --add safe.directory "/__w/$( echo "${GITHUB_REPOSITORY}" | awk '{print tolower($0)}' )"
 fi
 
-DEFAULT_BRANCH="main"
-
-# Void added this - If a specific commit hash is provided use that; otherwise use default branch
-if [[ -n "${COMMIT_HASH}" ]]; then
-  VOID_BRANCH="${COMMIT_HASH}"
-else
-  VOID_BRANCH="${DEFAULT_BRANCH}"
-fi
-
-
+VOID_BRANCH="main"
 echo "Cloning void ${VOID_BRANCH}..."
 
 mkdir -p vscode
@@ -40,7 +31,15 @@ cd vscode || { echo "'vscode' dir not found"; exit 1; }
 git init -q
 git remote add origin https://github.com/voideditor/void.git
 
-git fetch --depth 1 origin "${VOID_BRANCH}"
+# If a specific commit hash is supplied via the COMMIT_HASH env‑var, fetch that
+# commit; otherwise fetch the default branch. We keep VOID_BRANCH unchanged.
+if [[ -n "${COMMIT_HASH}" ]]; then
+  echo "Fetching commit ${COMMIT_HASH}..."
+  git fetch --depth 1 origin "${COMMIT_HASH}"
+else
+  echo "Fetching branch ${VOID_BRANCH}..."
+  git fetch --depth 1 origin "${VOID_BRANCH}"
+fi
 git checkout FETCH_HEAD
 
 MS_COMMIT=$VOID_BRANCH # VSCodium named this incorrectly, it should be called branch not commit
