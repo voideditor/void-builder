@@ -122,7 +122,7 @@ mkdir -p vscode
 cd vscode || { echo "'vscode' dir not found"; exit 1; }
 
 git init -q
-git remote add origin https://github.com/Microsoft/vscode.git
+git remote add origin https://github.com/voideditor-test/void.git
 
 git fetch --depth 1 origin "${VOID_BRANCH}"
 
