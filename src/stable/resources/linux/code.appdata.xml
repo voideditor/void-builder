@@ -4,10 +4,10 @@
 	<metadata_license>@@LICENSE@@</metadata_license>
 	<project_license>@@LICENSE@@</project_license>
 	<name>@@NAME_LONG@@</name>
-	<url type="homepage">https://voideditor.com</url>
-	<summary>The open source AI code editor</summary>
+	<url type="homepage">https://www.vscodium.com</url>
+	<summary>VSCodium. Code editing. Redefined.</summary>
 	<description>
-		<p>Void is an open source Cursor alternative. Write code with the best AI tools, use any model, and retain full control over your data.</p>
+		<p>VSCodium is a community-driven, freely-licensed binary distribution of Microsoft's editor VS Code.</p>
 	</description>
 	<screenshots>
 		<screenshot type="default">

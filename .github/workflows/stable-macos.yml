@@ -25,16 +25,14 @@ on:
     - '**/*.md'
 
 env:
-  APP_NAME: Void
-  # ASSETS_REPOSITORY is where all the downloads are.
-  # VSCodium has this be the current repo, voideditor/void-builder:
-  # ASSETS_REPOSITORY: ${{ github.repository }}
-
-  ASSETS_REPOSITORY: ${{ github.repository_owner }}/binaries
+  APP_NAME: VSCodium
+  ASSETS_REPOSITORY: ${{ github.repository }}
+  BINARY_NAME: codium
+  GH_REPO_PATH: ${{ github.repository }}
+  ORG_NAME: ${{ github.repository_owner }}
   OS_NAME: osx
   VERSIONS_REPOSITORY: ${{ github.repository_owner }}/versions
   VSCODE_QUALITY: stable
-  NEW_RELEASE: true
 
 jobs:
   build:
@@ -47,7 +45,7 @@ jobs:
         include:
           - runner: macos-13
             vscode_arch: x64
-          - runner: macos-14
+          - runner: [self-hosted, macOS, ARM64]
             vscode_arch: arm64
 
     steps:
@@ -103,33 +101,19 @@ jobs:
 
       - name: Release
         env:
-          GITHUB_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }}
-          GITHUB_USERNAME: ${{ github.repository_owner }}
-        run: ./release.sh # creates the github release in binaries/ (ASSETS_REPOSITORY = "binaries")
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./release.sh
         if: env.SHOULD_BUILD == 'yes' && env.SHOULD_DEPLOY == 'yes'
 
       - name: Update versions repo
         env:
           FORCE_UPDATE: ${{ github.event.inputs.force_version }}
-          GITHUB_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }} # used to be called BINARIES_RELEASE_PAT by aide
+          GITHUB_TOKEN: ${{ secrets.STRONGER_GITHUB_TOKEN }}
           GITHUB_USERNAME: ${{ github.repository_owner }}
         run: ./update_version.sh
-        # ASSET_NAME = VSCode-darwin-arm64.exe or whatever
-        # RELEASE_VERSION = voidVersion.date, eg 1.0.3.2025102454
-        # BUILD_SOURCEVERSION = checksum(RELEASE_VERSION)
-
-        # creates a JSON with these fields:
-        # sha1 = "assets/${ASSET_NAME}.sha1"
-        # sha256 = "assets/${ASSET_NAME}.sha256"
-        # url = (URL to the binary of this asset on github)
-        # name = "${RELEASE_VERSION}"
-        # version = "${BUILD_SOURCEVERSION}"
-        # productVersion = "${RELEASE_VERSION}"
-        # timestamp = now()
-
         if: env.SHOULD_DEPLOY == 'yes'
 
-      - name: Upload assets # Void - does not typically run - only happens if not deploying but only building so we have a place to get the built assets from
+      - name: Upload assets
         uses: actions/upload-artifact@v4
         with:
           name: bin-${{ matrix.vscode_arch }}

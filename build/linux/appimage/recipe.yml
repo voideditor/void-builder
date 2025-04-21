@@ -17,9 +17,7 @@ ingredients:
   script:
     - pwd
     - cp ../../../../vscode/.build/linux/deb/amd64/deb/*.deb .
-    # Void - instead of extracting version from deb, use the RELEASE_VERSION env variable
-    # - ls @@APPNAME@@_*.deb | cut -d _ -f 2 > VERSION
-    - echo "${RELEASE_VERSION}" > VERSION
+    - ls @@APPNAME@@_*.deb | cut -d _ -f 2 > VERSION
 
 script:
   - sed -i -e 's|/usr/share/pixmaps/||g' usr/share/applications/@@APPNAME@@.desktop

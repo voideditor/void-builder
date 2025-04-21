@@ -22,20 +22,19 @@ if [[ "${VSCODE_ARCH}" == "x64" ]]; then
   ./pkg2appimage.AppImage --appimage-extract && mv ./squashfs-root ./pkg2appimage.AppDir
 
   # add update's url
-  # Void - this line is important - ask GPT about it
-  sed -i 's/generate_type2_appimage/generate_type2_appimage -u "gh-releases-zsync|voideditor|binaries|latest|*.AppImage.zsync"/' pkg2appimage.AppDir/AppRun
+  sed -i 's/generate_type2_appimage/generate_type2_appimage -u "gh-releases-zsync|VSCodium|vscodium|latest|*.AppImage.zsync"/' pkg2appimage.AppDir/AppRun
 
   # remove check so build in docker can succeed
   sed -i 's/grep docker/# grep docker/' pkg2appimage.AppDir/usr/share/pkg2appimage/functions.sh
 
   if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
-    sed -i 's|@@NAME@@|Void-Insiders|g' recipe.yml
-    sed -i 's|@@APPNAME@@|void-insiders|g' recipe.yml
-    sed -i 's|@@ICON@@|void-insiders|g' recipe.yml
+    sed -i 's|@@NAME@@|VSCodium-Insiders|g' recipe.yml
+    sed -i 's|@@APPNAME@@|codium-insiders|g' recipe.yml
+    sed -i 's|@@ICON@@|vscodium-insiders|g' recipe.yml
   else
-    sed -i 's|@@NAME@@|Void|g' recipe.yml
-    sed -i 's|@@APPNAME@@|void|g' recipe.yml
-    sed -i 's|@@ICON@@|void|g' recipe.yml
+    sed -i 's|@@NAME@@|VSCodium|g' recipe.yml
+    sed -i 's|@@APPNAME@@|codium|g' recipe.yml
+    sed -i 's|@@ICON@@|vscodium|g' recipe.yml
   fi
 
   # workaround that enforces x86 ARCH for pkg2appimage having /__w/vscodium/vscodium/build/linux/appimage/VSCodium/VSCodium.AppDir/usr/share/codium/resources/app/node_modules/rc/index.js is of architecture armhf
@@ -44,7 +43,7 @@ if [[ "${VSCODE_ARCH}" == "x64" ]]; then
 
   rm -f pkg2appimage-*.AppImage
   rm -rf pkg2appimage.AppDir
-  # rm -rf Void*
+  rm -rf VSCodium*
 fi
 
 cd "${CALLER_DIR}"

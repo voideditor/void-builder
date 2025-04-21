@@ -27,10 +27,10 @@ if [[ -z "${BUILD_SOURCEVERSION}" ]]; then
   exit 0
 fi
 
-if [[ "${VSCODE_ARCH}" == "ppc64le" ]] || [[ "${VSCODE_ARCH}" == "riscv64" ]] ; then
-  echo "Skip PPC64LE since only reh is published"
-  exit 0
-fi
+# if [[ "${VSCODE_ARCH}" == "ppc64le" ]] || [[ "${VSCODE_ARCH}" == "riscv64" ]] ; then
+#   echo "Skip PPC64LE since only reh is published"
+#   exit 0
+# fi
 
 #  {
 #    "url": "https://az764295.vo.msecnd.net/stable/51b0b28134d51361cf996d2f0a1c698247aeabd8/VSCode-darwin-stable.zip",
@@ -62,7 +62,7 @@ generateJson() {
   url="${URL_BASE}/${ASSET_NAME}"
   name="${RELEASE_VERSION}"
   version="${BUILD_SOURCEVERSION}"
-  productVersion="${RELEASE_VERSION}"
+  productVersion="$( transformVersion "${RELEASE_VERSION}" )"
   timestamp=$( node -e 'console.log(Date.now())' )
 
   if [[ ! -f "assets/${ASSET_NAME}" ]]; then
@@ -92,6 +92,25 @@ generateJson() {
     --arg sha256hash      "${sha256hash}" \
     '. | .url=$url | .name=$name | .version=$version | .productVersion=$productVersion | .hash=$hash | .timestamp=$timestamp | .sha256hash=$sha256hash' \
     <<<'{}' )
+}
+
+transformVersion() {
+  local version parts
+
+  version="${1%-insider}"
+
+  IFS='.' read -r -a parts <<< "${version}"
+
+  # Remove leading zeros from third part
+  parts[2]="$((10#${parts[2]}))"
+
+  version="${parts[0]}.${parts[1]}.${parts[2]}.0"
+
+  if [[ "${1}" == *-insider ]]; then
+    version="${version}-insider"
+  fi
+
+  echo "${version}"
 }
 
 updateLatestVersion() {
@@ -170,7 +189,7 @@ fi
 
 cd "${REPOSITORY_NAME}" || { echo "'${REPOSITORY_NAME}' dir not found"; exit 1; }
 
-git pull origin main # in case another build just pushed
+git pull origin master # in case another build just pushed
 git add .
 
 CHANGES=$( git status --porcelain )
@@ -182,9 +201,9 @@ if [[ -n "${CHANGES}" ]]; then
 
   git commit -m "CI update: ${dateAndMonth} (Build ${GITHUB_RUN_NUMBER})"
 
-  if ! git push origin main --quiet; then
-    git pull origin main
-    git push origin main --quiet
+  if ! git push origin master --quiet; then
+    git pull origin master
+    git push origin master --quiet
   fi
 else
   echo "No changes"
