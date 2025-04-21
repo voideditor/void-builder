@@ -32,7 +32,7 @@ env:
 
   ASSETS_REPOSITORY: ${{ github.repository_owner }}/binaries
   BINARY_NAME: void
-  GH_REPO_PATH: ${{ github.repository }}
+  GH_REPO_PATH: ${{ github.repository_owner }}/binaries
   ORG_NAME: ${{ github.repository_owner }}
   OS_NAME: osx
   VERSIONS_REPOSITORY: ${{ github.repository_owner }}/versions

@@ -28,7 +28,7 @@ env:
   APP_NAME: Void
   ASSETS_REPOSITORY: ${{ github.repository_owner }}/binaries
   BINARY_NAME: void
-  GH_REPO_PATH: ${{ github.repository }}
+  GH_REPO_PATH: ${{ github.repository_owner }}/binaries
   ORG_NAME: ${{ github.repository_owner }}
   OS_NAME: windows
   VERSIONS_REPOSITORY: ${{ github.repository_owner }}/versions
