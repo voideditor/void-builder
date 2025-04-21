@@ -22,7 +22,16 @@ if [[ "${CI_BUILD}" != "no" ]]; then
   git config --global --add safe.directory "/__w/$( echo "${GITHUB_REPOSITORY}" | awk '{print tolower($0)}' )"
 fi
 
-VOID_BRANCH="main"
+DEFAULT_BRANCH="main"
+
+# Void added this - If a specific commit hash is provided use that; otherwise use default branch
+if [[ -n "${COMMIT_HASH}" ]]; then
+  VOID_BRANCH="${COMMIT_HASH}"
+else
+  VOID_BRANCH="${DEFAULT_BRANCH}"
+fi
+
+
 echo "Cloning void ${VOID_BRANCH}..."
 
 mkdir -p vscode

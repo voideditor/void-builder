@@ -12,6 +12,9 @@ on:
       checkout_pr:
         type: string
         description: Checkout PR
+      commit_hash:
+        type: string
+        description: Commit hash to checkout (optional)
   repository_dispatch:
     types: [stable]
   push:
@@ -54,8 +57,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        # If the workflow is manually dispatched with a commit_hash input, checkout that specific
+        # commit. Otherwise, fall back to the value of GITHUB_BRANCH (default behaviour).
         with:
-          ref: ${{ env.GITHUB_BRANCH }}
+          ref: ${{ github.event.inputs.commit_hash != '' && github.event.inputs.commit_hash || env.GITHUB_BRANCH }}
 
       - name: Switch to relevant branch
         env:
@@ -74,6 +79,8 @@ jobs:
         if: env.VSCODE_ARCH == 'x64'
 
       - name: Clone VSCode repo
+        env:
+          COMMIT_HASH: ${{ github.event.inputs.commit_hash }}
         run: . get_repo.sh
 
       - name: Check PR or cron
