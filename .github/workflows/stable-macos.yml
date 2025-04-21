@@ -25,9 +25,13 @@ on:
     - '**/*.md'
 
 env:
-  APP_NAME: VSCodium
-  ASSETS_REPOSITORY: ${{ github.repository }}
-  BINARY_NAME: codium
+  APP_NAME: Void
+  # ASSETS_REPOSITORY is where all the downloads are.
+  # VSCodium has this be the current repo, voideditor/void-builder:
+  # ASSETS_REPOSITORY: ${{ github.repository }}
+
+  ASSETS_REPOSITORY: ${{ github.repository_owner }}/binaries
+  BINARY_NAME: void
   GH_REPO_PATH: ${{ github.repository }}
   ORG_NAME: ${{ github.repository_owner }}
   OS_NAME: osx

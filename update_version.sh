@@ -189,7 +189,8 @@ fi
 
 cd "${REPOSITORY_NAME}" || { echo "'${REPOSITORY_NAME}' dir not found"; exit 1; }
 
-git pull origin master # in case another build just pushed
+# Void made master into main (why would anyone change from main -> master??)
+git pull origin main # in case another build just pushed
 git add .
 
 CHANGES=$( git status --porcelain )

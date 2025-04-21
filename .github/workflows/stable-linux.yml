@@ -26,9 +26,9 @@ on:
 
 env:
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
-  APP_NAME: VSCodium
-  ASSETS_REPOSITORY: ${{ github.repository }}
-  BINARY_NAME: codium
+  APP_NAME: Void
+  ASSETS_REPOSITORY: ${{ github.repository_owner }}/binaries
+  BINARY_NAME: void
   DISABLE_UPDATE: 'yes'
   GH_REPO_PATH: ${{ github.repository }}
   ORG_NAME: ${{ github.repository_owner }}
@@ -468,20 +468,21 @@ jobs:
           retention-days: 3
         if: env.DISABLED != 'yes' && env.SHOULD_DEPLOY == 'no' && github.event.inputs.generate_assets == 'true'
 
-  aur:
-    needs:
-      - check
-      - build
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-        - package_name: vscodium
-          package_type: stable
-        # - package_name: vscodium-git
-        #   package_type: rolling
-    if: needs.check.outputs.SHOULD_DEPLOY == 'yes'
+  # Void commented this out:
+  # aur:
+  #   needs:
+  #     - check
+  #     - build
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #       - package_name: vscodium
+  #         package_type: stable
+  #       # - package_name: vscodium-git
+  #       #   package_type: rolling
+  #   if: needs.check.outputs.SHOULD_DEPLOY == 'yes'
 
     steps:
       - name: Publish ${{ matrix.package_name }}
@@ -493,21 +494,21 @@ jobs:
           aur_username: ${{ secrets.AUR_USERNAME }}
           aur_email: ${{ secrets.AUR_EMAIL }}
 
-  snap:
-    needs:
-      - check
-      - build
-    runs-on: ubuntu-latest
-    env:
-      RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
-      SNAP_NAME: codium
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-        - amd64
-        - arm64
-    if: needs.check.outputs.SHOULD_DEPLOY == 'yes' && needs.check.outputs.SHOULD_BUILD_SNAP != 'no' && vars.DISABLE_STABLE_SNAP != 'yes'
+  # snap:
+  #   needs:
+  #     - check
+  #     - build
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     RELEASE_VERSION: ${{ needs.check.outputs.RELEASE_VERSION }}
+  #     SNAP_NAME: codium
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       platform:
+  #       - amd64
+  #       - arm64
+  #   if: needs.check.outputs.SHOULD_DEPLOY == 'yes' && needs.check.outputs.SHOULD_BUILD_SNAP != 'no' && vars.DISABLE_STABLE_SNAP != 'yes'
 
     steps:
       - uses: actions/checkout@v4

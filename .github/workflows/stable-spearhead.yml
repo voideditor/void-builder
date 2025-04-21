@@ -19,9 +19,9 @@ jobs:
   build:
     runs-on: macos-14
     env:
-      APP_NAME: VSCodium
-      ASSETS_REPOSITORY: ${{ github.repository }}
-      BINARY_NAME: codium
+      APP_NAME: Void
+      ASSETS_REPOSITORY:  ${{ github.repository_owner }}/binaries # VERY IMPORTANT
+      BINARY_NAME: void
       GH_REPO_PATH: ${{ github.repository }}
       ORG_NAME: ${{ github.repository_owner }}
       OS_NAME: osx

@@ -12,7 +12,8 @@ else
   cp -rp src/stable/* vscode/
 fi
 
-cp -f LICENSE vscode/LICENSE.txt
+# Void - keep our license...
+# cp -f LICENSE vscode/LICENSE.txt
 
 cd vscode || { echo "'vscode' dir not found"; exit 1; }
 
@@ -27,6 +28,7 @@ echo "BINARY_NAME=\"${BINARY_NAME}\""
 echo "GH_REPO_PATH=\"${GH_REPO_PATH}\""
 echo "ORG_NAME=\"${ORG_NAME}\""
 
+echo "Applying patches at ../patches/*.patch..." # Void comment
 for file in ../patches/*.patch; do
   if [[ -f "${file}" ]]; then
     apply_patch "${file}"
@@ -34,6 +36,7 @@ for file in ../patches/*.patch; do
 done
 
 if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
+  echo "Applying insider patches..." # Void comment
   for file in ../patches/insider/*.patch; do
     if [[ -f "${file}" ]]; then
       apply_patch "${file}"
@@ -42,6 +45,7 @@ if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
 fi
 
 if [[ -d "../patches/${OS_NAME}/" ]]; then
+  echo "Applying OS patches (${OS_NAME})..." # Void comment
   for file in "../patches/${OS_NAME}/"*.patch; do
     if [[ -f "${file}" ]]; then
       apply_patch "${file}"
@@ -49,6 +53,7 @@ if [[ -d "../patches/${OS_NAME}/" ]]; then
   done
 fi
 
+echo "Applying user patches..." # Void comment
 for file in ../patches/user/*.patch; do
   if [[ -f "${file}" ]]; then
     apply_patch "${file}"
@@ -132,12 +137,12 @@ setpath "product" "tipsAndTricksUrl" "https://go.microsoft.com/fwlink/?linkid=85
 setpath "product" "twitterUrl" "https://go.microsoft.com/fwlink/?LinkID=533687"
 
 if [[ "${DISABLE_UPDATE}" != "yes" ]]; then
-  setpath "product" "updateUrl" "https://raw.githubusercontent.com/VSCodium/versions/refs/heads/master"
+  setpath "product" "updateUrl" "https://raw.githubusercontent.com/voideditor/versions/refs/heads/main" # Void - VERY IMPORTANT
 
   if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
     setpath "product" "downloadUrl" "https://github.com/VSCodium/vscodium-insiders/releases"
   else
-    setpath "product" "downloadUrl" "https://github.com/VSCodium/vscodium/releases"
+    setpath "product" "downloadUrl" "https://github.com/voideditor/binaries/releases"
   fi
 fi
 
@@ -187,11 +192,12 @@ else
   setpath "product" "win32x64AppId" "{{88DA3577-054F-4CA1-8122-7D820494CFFB}"
   setpath "product" "win32arm64AppId" "{{67DEE444-3D04-4258-B92A-BC1F0FF2CAE4}"
   setpath "product" "win32UserAppId" "{{0FD05EB4-651E-4E78-A062-515204B47A3A}"
-  setpath "product" "win32x64UserAppId" "{{2E1F05D1-C245-4562-81EE-28188DB6FD17}"
-  setpath "product" "win32arm64UserAppId" "{{57FD70A5-1B8D-4875-9F40-C5553F094828}"
-  setpath "product" "tunnelApplicationName" "codium-tunnel"
-  setpath "product" "win32TunnelServiceMutex" "vscodium-tunnelservice"
-  setpath "product" "win32TunnelMutex" "vscodium-tunnel"
+  setpath "product" "win32x64UserAppId" "{{8BED5DC1-6C55-46E6-9FE6-18F7E6F7C7F1}"
+  setpath "product" "win32arm64UserAppId" "{{F6C87466-BC82-4A8F-B0FF-18CA366BA4D8}"
+  # Void commented this out - already in here
+  # setpath "product" "tunnelApplicationName" "codium-tunnel"
+  # setpath "product" "win32TunnelServiceMutex" "vscodium-tunnelservice"
+  # setpath "product" "win32TunnelMutex" "vscodium-tunnel"
 fi
 
 jsonTmp=$( jq -s '.[0] * .[1]' product.json ../product.json )
@@ -214,6 +220,17 @@ if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
 else
   setpath "resources/server/manifest" "name" "VSCodium"
   setpath "resources/server/manifest" "short_name" "VSCodium"
+fi
+
+cp resources/server/manifest.json{,.bak}
+
+if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
+  setpath "resources/server/manifest" "name" "VSCodium - Insiders"
+  setpath "resources/server/manifest" "short_name" "VSCodium - Insiders"
+else
+  # Void already has this
+  # setpath "resources/server/manifest" "name" "VSCodium"
+  # setpath "resources/server/manifest" "short_name" "VSCodium"
 fi
 
 # announcements

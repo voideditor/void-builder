@@ -649,6 +649,8 @@ fi
 
 
 echo "SHOULD_BUILD=${SHOULD_BUILD}" >> "${GITHUB_ENV}"
+# Void - Force SHOULD_BUILD_APPIMAGE to "yes" regardless of previous settings
+export SHOULD_BUILD_APPIMAGE="yes"
 echo "SHOULD_BUILD_APPIMAGE=${SHOULD_BUILD_APPIMAGE}" >> "${GITHUB_ENV}"
 echo "SHOULD_BUILD_DEB=${SHOULD_BUILD_DEB}" >> "${GITHUB_ENV}"
 echo "SHOULD_BUILD_DMG=${SHOULD_BUILD_DMG}" >> "${GITHUB_ENV}"

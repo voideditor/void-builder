@@ -2,8 +2,16 @@
 
 if [[ -z "${BUILD_SOURCEVERSION}" ]]; then
 
-    if type -t "sha1sum" &> /dev/null; then
-      BUILD_SOURCEVERSION=$( echo "${RELEASE_VERSION/-*/}" | sha1sum | cut -d' ' -f1 )
+    # Void updated this to use the BUILD_SOURCEVERSION with voidVersion
+    echo "running version.sh"
+    # Check if vscode directory exists
+    if [[ -d "./vscode" ]]; then
+        echo "getting vscode source version..."
+        # Get the current commit hash from the vscode repository
+        CURRENT_DIR=$(pwd)
+        cd ./vscode
+        BUILD_SOURCEVERSION=$(git rev-parse HEAD)
+        cd ..
     else
       npm install -g checksum
 
