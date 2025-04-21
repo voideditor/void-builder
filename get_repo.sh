@@ -3,173 +3,47 @@
 
 set -e
 
+# Echo all environment variables used by this script
+echo "----------- get_repo -----------"
+echo "Environment variables:"
+echo "CI_BUILD=${CI_BUILD}"
+echo "GITHUB_REPOSITORY=${GITHUB_REPOSITORY}"
+echo "RELEASE_VERSION=${RELEASE_VERSION}"
+echo "VSCODE_LATEST=${VSCODE_LATEST}"
+echo "VSCODE_QUALITY=${VSCODE_QUALITY}"
+echo "GITHUB_ENV=${GITHUB_ENV}"
+
+echo "SHOULD_DEPLOY=${SHOULD_DEPLOY}"
+echo "SHOULD_BUILD=${SHOULD_BUILD}"
+echo "-------------------------"
+
 # git workaround
 if [[ "${CI_BUILD}" != "no" ]]; then
   git config --global --add safe.directory "/__w/$( echo "${GITHUB_REPOSITORY}" | awk '{print tolower($0)}' )"
 fi
 
-if [[ -z "${RELEASE_VERSION}" ]]; then
-  if [[ "${VSCODE_LATEST}" == "yes" ]] || [[ ! -f "./upstream/${VSCODE_QUALITY}.json" ]]; then
-    echo "Retrieve lastest version"
-    UPDATE_INFO=$( curl --silent --fail "https://update.code.visualstudio.com/api/update/darwin/${VSCODE_QUALITY}/0000000000000000000000000000000000000000" )
-  else
-    echo "Get version from ${VSCODE_QUALITY}.json"
-    MS_COMMIT=$( jq -r '.commit' "./upstream/${VSCODE_QUALITY}.json" )
-    MS_TAG=$( jq -r '.tag' "./upstream/${VSCODE_QUALITY}.json" )
-  fi
-
-  if [[ -z "${MS_COMMIT}" ]]; then
-    MS_COMMIT=$( echo "${UPDATE_INFO}" | jq -r '.version' )
-    MS_TAG=$( echo "${UPDATE_INFO}" | jq -r '.name' )
-
-    if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
-      MS_TAG="${MS_TAG/\-insider/}"
-    fi
-  fi
-
-  TIME_PATCH=$( printf "%04d" $(($(date +%-j) * 24 + $(date +%-H))) )
-
-  if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
-    RELEASE_VERSION="${MS_TAG}${TIME_PATCH}-insider"
-  else
-    RELEASE_VERSION="${MS_TAG}${TIME_PATCH}"
-  fi
-else
-  if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
-    if [[ "${RELEASE_VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-5])[0-9]+-insider$ ]];
-    then
-      MS_TAG="${BASH_REMATCH[1]}"
-    else
-      echo "Error: Bad RELEASE_VERSION: ${RELEASE_VERSION}"
-      exit 1
-    fi
-  else
-    if [[ "${RELEASE_VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-5])[0-9]+$ ]];
-    then
-      MS_TAG="${BASH_REMATCH[1]}"
-    else
-      echo "Error: Bad RELEASE_VERSION: ${RELEASE_VERSION}"
-      exit 1
-    fi
-  fi
-
-  if [[ "${MS_TAG}" == "$( jq -r '.tag' "./upstream/${VSCODE_QUALITY}.json" )" ]]; then
-    MS_COMMIT=$( jq -r '.commit' "./upstream/${VSCODE_QUALITY}.json" )
-  else
-    echo "Error: No MS_COMMIT for ${RELEASE_VERSION}"
-    exit 1
-  fi
-fi
-
-echo "RELEASE_VERSION=\"${RELEASE_VERSION}\""
-
-# if [[ -z "${RELEASE_VERSION}" ]]; then
-#   if [[ "${VSCODE_LATEST}" == "yes" ]] || [[ ! -f "./upstream/${VSCODE_QUALITY}.json" ]]; then
-#     echo "Retrieve lastest version"
-#     UPDATE_INFO=$( curl --silent --fail "https://update.code.visualstudio.com/api/update/darwin/${VSCODE_QUALITY}/0000000000000000000000000000000000000000" )
-#   else
-#     echo "Get version from ${VSCODE_QUALITY}.json"
-#     MS_COMMIT=$( jq -r '.commit' "./upstream/${VSCODE_QUALITY}.json" )
-#     MS_TAG=$( jq -r '.tag' "./upstream/${VSCODE_QUALITY}.json" )
-#   fi
-
-#   if [[ -z "${MS_COMMIT}" ]]; then
-#     MS_COMMIT=$( echo "${UPDATE_INFO}" | jq -r '.version' )
-#     MS_TAG=$( echo "${UPDATE_INFO}" | jq -r '.name' )
-
-#     if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
-#       MS_TAG="${MS_TAG/\-insider/}"
-#     fi
-#   fi
-
-#   TIME_PATCH=$( printf "%04d" $(($(date +%-j) * 24 + $(date +%-H))) )
-
-#   if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
-#     RELEASE_VERSION="${MS_TAG}${TIME_PATCH}-insider"
-#   else
-#     RELEASE_VERSION="${MS_TAG}${TIME_PATCH}"
-#   fi
-# else
-#   if [[ "${VSCODE_QUALITY}" == "insider" ]]; then
-#     if [[ "${RELEASE_VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-5])[0-9]+-insider$ ]];
-#     then
-#       MS_TAG="${BASH_REMATCH[1]}"
-#     else
-#       echo "Error: Bad RELEASE_VERSION: ${RELEASE_VERSION}"
-#       exit 1
-#     fi
-#   else
-#     if [[ "${RELEASE_VERSION}" =~ ^([0-9]+\.[0-9]+\.[0-5])[0-9]+$ ]];
-#     then
-#       MS_TAG="${BASH_REMATCH[1]}"
-#     else
-#       echo "Error: Bad RELEASE_VERSION: ${RELEASE_VERSION}"
-#       exit 1
-#     fi
-#   fi
-
-#   if [[ "${MS_TAG}" == "$( jq -r '.tag' "./upstream/${VSCODE_QUALITY}.json" )" ]]; then
-#     MS_COMMIT=$( jq -r '.commit' "./upstream/${VSCODE_QUALITY}.json" )
-#   else
-#     echo "Error: No MS_COMMIT for ${RELEASE_VERSION}"
-#     exit 1
-#   fi
-# fi
-
-# echo "RELEASE_VERSION=\"${RELEASE_VERSION}\""
+VOID_BRANCH="main"
+echo "Cloning void ${VOID_BRANCH}..."
 
 mkdir -p vscode
 cd vscode || { echo "'vscode' dir not found"; exit 1; }
 
 git init -q
-git remote add origin https://github.com/voideditor-test/void.git
+git remote add origin https://github.com/voideditor/void.git
 
 git fetch --depth 1 origin "${VOID_BRANCH}"
-
-# Void - these tags will exist
-# # figure out latest tag by calling MS update API
-# if [[ -z "${MS_TAG}" ]]; then
-#   UPDATE_INFO=$( curl --silent --fail "https://update.code.visualstudio.com/api/update/darwin/${VSCODE_QUALITY}/0000000000000000000000000000000000000000" )
-#   MS_COMMIT=$( echo "${UPDATE_INFO}" | jq -r '.version' )
-#   MS_TAG=$( echo "${UPDATE_INFO}" | jq -r '.name' )
-# elif [[ -z "${MS_COMMIT}" ]]; then
-#   REFERENCE=$( git ls-remote --tags | grep -x ".*refs\/tags\/${MS_TAG}" | head -1 )
-
-#   if [[ -z "${REFERENCE}" ]]; then
-#     echo "Error: The following tag can't be found: ${MS_TAG}"
-#     exit 1
-#   elif [[ "${REFERENCE}" =~ ^([[:alnum:]]+)[[:space:]]+refs\/tags\/([0-9]+\.[0-9]+\.[0-5])$ ]]; then
-#     MS_COMMIT="${BASH_REMATCH[1]}"
-#     MS_TAG="${BASH_REMATCH[2]}"
-#   else
-#     echo "Error: The following reference can't be parsed: ${REFERENCE}"
-#     exit 1
-#   fi
-# fi
-
-echo "MS_TAG=\"${MS_TAG}\""
-echo "MS_COMMIT=\"${MS_COMMIT}\""
-
-git fetch --depth 1 origin "${MS_COMMIT}"
 git checkout FETCH_HEAD
 
-  if [[ -z "${REFERENCE}" ]]; then
-    echo "Error: The following tag can't be found: ${MS_TAG}"
-    exit 1
-  elif [[ "${REFERENCE}" =~ ^([[:alnum:]]+)[[:space:]]+refs\/tags\/([0-9]+\.[0-9]+\.[0-5])$ ]]; then
-    MS_COMMIT="${BASH_REMATCH[1]}"
-    MS_TAG="${BASH_REMATCH[2]}"
-  else
-    echo "Error: The following reference can't be parsed: ${REFERENCE}"
-    exit 1
-  fi
-fi
+MS_COMMIT=$VOID_BRANCH # VSCodium named this incorrectly, it should be called branch not commit
+MS_TAG=$( jq -r '.voidVersion' "product.json" )
 
-echo "MS_TAG=\"${MS_TAG}\""
+date=$( date +%Y%j )
+RELEASE_VERSION="${MS_TAG}.${date: -5}"
+# RELEASE_VERSION is later used as version (1.0.3+RELEASE_VERSION), so it MUST be a number or it will throw a semver error in void
+
+echo "RELEASE_VERSION=\"${RELEASE_VERSION}\""
 echo "MS_COMMIT=\"${MS_COMMIT}\""
-
-git fetch --depth 1 origin "${MS_COMMIT}"
-git checkout FETCH_HEAD
+echo "MS_TAG=\"${MS_TAG}\""
 
 cd ..
 
@@ -179,6 +53,12 @@ if [[ "${GITHUB_ENV}" ]]; then
   echo "MS_COMMIT=${MS_COMMIT}" >> "${GITHUB_ENV}"
   echo "RELEASE_VERSION=${RELEASE_VERSION}" >> "${GITHUB_ENV}"
 fi
+
+echo "----------- get_repo exports -----------"
+echo "MS_TAG ${MS_TAG}"
+echo "MS_COMMIT ${MS_COMMIT}"
+echo "RELEASE_VERSION ${RELEASE_VERSION}"
+echo "----------------------"
 
 export MS_TAG
 export MS_COMMIT
