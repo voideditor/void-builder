@@ -21,7 +21,8 @@ ingredients:
 
 script:
   - sed -i -e 's|/usr/share/pixmaps/||g' usr/share/applications/@@APPNAME@@.desktop
-  - sed -i 's|/usr/share/void/void|/usr/share/codium/codium|' usr/share/applications/@@APPNAME@@.desktop
+  - sed -i 's|/usr/share/void/void|/usr/share/codium/codium|' usr/share/applications/@@APPNAME@@.desktop # added by BawsDeep
+  # - sed -i 's|Exec=/usr/share/void/void|Exec=void|' usr/share/applications/@@APPNAME@@.desktop # (either this or the above can be used)
   - cp usr/share/applications/@@APPNAME@@.desktop .
   - cp usr/share/pixmaps/@@ICON@@.png .
   - /usr/bin/convert @@ICON@@.png -resize 512x512 usr/share/icons/hicolor/512x512/apps/@@ICON@@.png
