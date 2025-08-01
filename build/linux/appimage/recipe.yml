@@ -21,6 +21,7 @@ ingredients:
 
 script:
   - sed -i -e 's|/usr/share/pixmaps/||g' usr/share/applications/@@APPNAME@@.desktop
+  - sed -i 's|/usr/share/void/void|/usr/share/codium/codium|' usr/share/applications/@@APPNAME@@.desktop
   - cp usr/share/applications/@@APPNAME@@.desktop .
   - cp usr/share/pixmaps/@@ICON@@.png .
   - /usr/bin/convert @@ICON@@.png -resize 512x512 usr/share/icons/hicolor/512x512/apps/@@ICON@@.png
