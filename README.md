@@ -12,7 +12,7 @@ The  `.patch` files from VSCodium get rid of telemetry in Void (the core purpose
 
 - The workflow that builds Void for Mac is called `stable-macos.sh`. We added some comments so you can understand what's going on. Almost all the code is straight from VSCodium. The Linux and Windows files are very similar.
 
-- If you want to build and compile Void yourself, you just need to fork this repo and run the GitHub Workflows. If you want to handle auto updates too, just search for "Void" and "voideditor" and replace them with your own repo.
+- If you want to build and compile Void yourself, you just need to fork this repo and run the GitHub Workflows. If you want to handle auto updates too, just search for caps-sensitive "Void" and "voideditor" and replace them with your own repo.
 
 ## Rebasing
 - We often need to rebase `void` and `void-builder` onto `vscode` and `vscodium` to keep our build pipeline working when deprecations happen, but this is pretty easy. All the changes we made in `void/` are commented with the caps-sensitive word "Void" (except our images, which need to be done manually), so rebasing just involves copying the `vscode/` repo and searching "Void" to re-make all our changes. The same exact thing holds for copying the `vscodium/` repo onto this repo and searching "Void" and "voideditor" to keep our changes. Just make sure the vscode and vscodium versions align.
