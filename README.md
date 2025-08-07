@@ -4,7 +4,7 @@ This is a fork of VSCodium, which has a nice build pipeline that we're using for
 
 The purpose of this VSCodium fork is to run [Github Actions](https://github.com/voideditor/void-builder/actions). These actions build all the Void assets (.dmg, .zip, etc), store these binaries on a release in [`voideditor/binaries`](https://github.com/voideditor/binaries/releases), and then set the latest version in a text file on [`voideditor/versions`](https://github.com/voideditor/versions) so Void knows how to update to the latest version.
 
-The  `.patch` files from VSCodium get rid of telemetry in Void (the core purpose of VSCodium) and change VSCode's auto-update logic so updates are checked against `void` and not `vscode` (we just had to swap out a few URLs). These files are applied when the workflow runs and they're almost entirely straight from VSCodium, minus a few renames to Void.
+The  `.patch` files from VSCodium get rid of telemetry in Void (the core purpose of VSCodium) and change VSCode's auto-update logic so updates are checked against `void` and not `vscode` (we just had to swap out a few URLs). These changes described by the `.patch` files are applied to `void/` during the workflow run, and they're almost entirely straight from VSCodium, minus a few renames to Void.
 
 ## Notes
 
