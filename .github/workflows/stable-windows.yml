@@ -51,7 +51,7 @@ jobs:
       SHOULD_DEPLOY: ${{ env.SHOULD_DEPLOY }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.GITHUB_BRANCH }}
 
@@ -91,7 +91,7 @@ jobs:
       BUILD_SOURCEVERSION: ${{ env.BUILD_SOURCEVERSION }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.GITHUB_BRANCH }}
         if: env.SHOULD_BUILD == 'yes'
@@ -180,7 +180,7 @@ jobs:
       SHOULD_DEPLOY: ${{ env.SHOULD_DEPLOY }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ env.GITHUB_BRANCH }}
         if: env.SHOULD_BUILD == 'yes'
@@ -293,7 +293,7 @@ jobs:
   #   if: needs.build.outputs.SHOULD_DEPLOY == 'yes'
 
     # steps:
-    #   - uses: actions/checkout@v4
+    #   - uses: actions/checkout@v5
     #     with:
     #       ref: ${{ env.GITHUB_BRANCH }}
 
